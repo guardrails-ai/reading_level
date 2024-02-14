@@ -1,7 +1,7 @@
 [project]
-name = "regexmatch"
+name = "reading_level"
 version = "0.0.0"
-description = "Template repo for Guardrails Hub validators."
+description = "Parses text to find its readability as a US grade level number (0-12)."
 authors = [
     {name = "Guardrails AI", email = "contact@guardrailsai.com"}
 ]
@@ -9,7 +9,7 @@ license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">= 3.8"
 dependencies = [
-    "rstr",
+    "py-readability-metrics",
     "guardrails-ai>=0.3.2"
 ]
 

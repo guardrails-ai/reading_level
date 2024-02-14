@@ -1,8 +1,6 @@
-import re
-import string
 from typing import Any, Callable, Dict, Optional
 
-import rstr
+from readability import Readability
 
 from guardrails.validator_base import (
     FailResult,
@@ -13,59 +11,62 @@ from guardrails.validator_base import (
 )
 
 
-@register_validator(name="guardrails/regex_match", data_type="string")
-class RegexMatch(Validator):
-    """Validates that a value matches a regular expression.
+@register_validator(name="guardrails/reading_level", data_type="string")
+class ReadingLevel(Validator):
+    """Parses text to find its readability as a US grade level number (0-12).
 
     **Key Properties**
 
-    | Property                      | Description                       |
-    | ----------------------------- | --------------------------------- |
-    | Name for `format` attribute   | `regex_match`                     |
-    | Supported data types          | `string`                          |
-    | Programmatic fix              | Generate a string that matches the regular expression |
+    | Property                      | Description     |
+    | ----------------------------- | --------------- |
+    | Name for `format` attribute   | `reading_level` |
+    | Supported data types          | `string`        |
+    | Programmatic fix              | None            |
 
     Args:
-        regex: Str regex pattern
-        match_type: Str in {"search", "fullmatch"} for a regex search or full-match option
+        min: Minimum reading US Grade level
+        max: Maximum reading US Grade level
     """  # noqa
 
     def __init__(
         self,
-        regex: str,
-        match_type: Optional[str] = None,
+        min: int,
+        max: int,
         on_fail: Optional[Callable] = None,
     ):
         # todo -> something forces this to be passed as kwargs and therefore xml-ized.
         # match_types = ["fullmatch", "search"]
 
-        if match_type is None:
-            match_type = "fullmatch"
-        assert match_type in [
-            "fullmatch",
-            "search",
-        ], 'match_type must be in ["fullmatch", "search"]'
+        assert min <= max, "min must be less than max"
 
-        super().__init__(on_fail=on_fail, match_type=match_type, regex=regex)
-        self._regex = regex
-        self._match_type = match_type
+        super().__init__(on_fail=on_fail, min=min, max=max)
+        self.min = min
+        self.max = max
 
     def validate(self, value: Any, metadata: Dict) -> ValidationResult:
-        p = re.compile(self._regex)
-        """Validates that value matches the provided regular expression."""
-        # Pad matching string on either side for fix
-        # example if we are performing a regex search
-        str_padding = (
-            "" if self._match_type == "fullmatch" else rstr.rstr(string.ascii_lowercase)
-        )
-        self._fix_str = str_padding + rstr.xeger(self._regex) + str_padding
+        r = Readability(value)
 
-        if not getattr(p, self._match_type)(value):
+        reading_score = int(r.flesch_kincaid().grade_level)
+        if reading_score < 4:
+            reading_score = max(4, int(r.spache().grade_level))
+
+        reading_score = max(reading_score, 0)
+        reading_score = min(reading_score, 12)
+
+        if reading_score < self.min:
             return FailResult(
-                error_message=f"Result must match {self._regex}",
-                fix_value=self._fix_str,
+                error_message=f"Reading level is {reading_score}, which is below the minimum of {self.min}",
+                fix_value=None,
             )
+        if reading_score > self.max:
+            return FailResult(
+                error_message=f"Reading level is {reading_score}, which is above the maximum of {self.max}",
+                fix_value=None,
+            )
+
         return PassResult()
 
     def to_prompt(self, with_keywords: bool = True) -> str:
-        return "results should match " + self._regex
+        if self.min == self.max:
+            return f"Result should be readable for students at a US grade level of {self.min}"
+        return f"Result should be readable for students between US grade levels {self.min} and {self.max}"
