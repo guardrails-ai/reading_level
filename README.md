@@ -84,7 +84,7 @@ guard.parse("""
 """)
 ```
 
-# API Reference
+## API Reference
 
 **`__init__(self, min, max, on_fail="noop")`**
 <ul>
