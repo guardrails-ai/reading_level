@@ -1,4 +1,4 @@
-# Overview
+## Overview
 
 | Developed by | Guardrails AI |
 | --- | --- |
@@ -16,6 +16,8 @@ This package uses the py-readability-metrics package to parse text and find its 
 
 Use this validator when you're requesting longer passages from your LLM. These algorithms are unreliable and will throw errors when trying to grade passages under 100 words.
 
+## Requirements
+- Dependencies: `py-readability-metrics`
 
 ## Installation
 
@@ -117,6 +119,3 @@ This method should not be called directly by the user. Instead, invoke `guard.pa
     This validator does not require any metadata
 
 </ul>
-
-**`__init__(self, on_fail="noop")`**
-<ul>
