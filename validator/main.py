@@ -1,7 +1,5 @@
 from typing import Any, Callable, Dict, Optional
 
-from readability import Readability
-
 from guardrails.validator_base import (
     FailResult,
     PassResult,
@@ -9,6 +7,7 @@ from guardrails.validator_base import (
     Validator,
     register_validator,
 )
+from readability import Readability
 
 
 @register_validator(name="guardrails/reading_level", data_type="string")

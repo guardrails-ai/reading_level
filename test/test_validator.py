@@ -9,31 +9,28 @@ In a bustling bakery filled with the sweet scent of muffins and cookies, lived a
 """
 
 
-
 def test_pass():
     guard = Guard.from_string(
-      validators=[ReadingLevel(min=7, max=7, on_fail="refrain")]
+        validators=[ReadingLevel(min=7, max=7, on_fail="refrain")]
     )
     res = guard.parse(seventh_grade_text)
     assert res.validated_output is seventh_grade_text
 
     guard = Guard.from_string(
-      validators=[ReadingLevel(min=1, max=8, on_fail="refrain")]
+        validators=[ReadingLevel(min=1, max=8, on_fail="refrain")]
     )
     assert res.validated_output is seventh_grade_text
 
 
-
 def test_fail():
     guard = Guard.from_string(
-      validators=[ReadingLevel(min=8, max=12, on_fail="refrain")]
+        validators=[ReadingLevel(min=8, max=12, on_fail="refrain")]
     )
 
     raw_output, guarded_output, *rest = guard.parse(seventh_grade_text)
     assert guarded_output is None
 
     guard = Guard.from_string(
-      validators=[ReadingLevel(min=1, max=6, on_fail="refrain")]
+        validators=[ReadingLevel(min=1, max=6, on_fail="refrain")]
     )
     assert guarded_output is None
-
