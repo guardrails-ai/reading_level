@@ -1,3 +1,24 @@
+# ⚠️ This validator has moved
+
+This validator now lives in the [Guardrails Hub monorepo](https://github.com/guardrails-ai/guardrails-hub-monorepo/tree/main/reading_level/py).
+**This repository is archived and no longer maintained** — please open issues and pull
+requests on the monorepo instead.
+
+```bash
+pip install guardrails-ai-reading-level
+```
+
+```python
+from guardrails import Guard
+from guardrails_ai.reading_level import ReadingLevel
+
+guard = Guard().use(ReadingLevel)
+```
+
+The registered validator name is unchanged, so existing guards keep working.
+
+---
+
 # Overview
 
 | Developed by | Guardrails AI |
